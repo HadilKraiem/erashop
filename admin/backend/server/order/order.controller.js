@@ -150,10 +150,6 @@ exports.createOrder = async (req, res) => {
       }
     }
 
-    res.status(200).json({
-      status: true,
-      message: "Orders created successfully.",
-    });
 
     for (const [sellerId, items] of Object.entries(itemsBySeller)) {
       const seller = await Seller.findById(sellerId);
@@ -228,37 +224,41 @@ exports.createOrder = async (req, res) => {
 
       console.log("order : ", order);
 
-      if (!seller.isBlock && seller.fcmToken !== null) {
-        const adminPromise = await admin;
+      if (seller && !seller.isBlock && seller.fcmToken) {
+        try {
+          const adminPromise = await admin;
 
-        const sellerPayload = {
-          token: seller.fcmToken,
-          notification: {
-            title: `💎 New Order Received!`,
-            body: `🛍️ You have a new order from ${user?.firstName}. Check your dashboard for details!`,
-          },
-        };
+          const sellerPayload = {
+            token: seller.fcmToken,
+            notification: {
+              title: `💎 New Order Received!`,
+              body: `🛍️ You have a new order from ${user?.firstName || "a customer"}. Check your dashboard for details!`,
+            },
+          };
 
-        adminPromise
-          .messaging()
-          .send(sellerPayload)
-          .then(async (response) => {
-            console.log("Successfully sent with response: ", response);
+          adminPromise
+            .messaging()
+            .send(sellerPayload)
+            .then(async (response) => {
+              console.log("Successfully sent with response: ", response);
 
-            const notification = new Notification();
-            notification.userId = dataFromCart?.userId;
-            notification.image = user?.image;
-            notification.sellerId = seller?._id;
-            notification.productId = item?.productId;
-            notification.title = sellerPayload?.notification?.title;
-            notification.message = sellerPayload?.notification?.body;
-            notification.notificationType = 1;
-            notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
-            await notification.save();
-          })
-          .catch((error) => {
-            console.log("Error sending message:      ", error);
-          });
+              const notification = new Notification();
+              notification.userId = dataFromCart?.userId;
+              notification.image = user?.image;
+              notification.sellerId = seller?._id;
+              notification.productId = updatedItems[0]?.productId;
+              notification.title = sellerPayload?.notification?.title;
+              notification.message = sellerPayload?.notification?.body;
+              notification.notificationType = 1;
+              notification.date = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+              await notification.save();
+            })
+            .catch((error) => {
+              console.log("Error sending message:      ", error);
+            });
+        } catch (fcmErr) {
+          console.log("Failed to process seller notification: ", fcmErr);
+        }
       }
     }
 
@@ -276,28 +276,38 @@ exports.createOrder = async (req, res) => {
       }
     );
 
-    if (user.fcmToken && user.fcmToken !== null) {
-      const userPayload = {
-        token: user.fcmToken,
-        notification: {
-          title: `🛒 Order Confirmed!`,
-          body: `🎁 Your order (ID: ${orderId}) has been successfully placed. Thank you for shopping with us! 📦`,
-        },
-      };
+    if (user.fcmToken) {
+      try {
+        const userPayload = {
+          token: user.fcmToken,
+          notification: {
+            title: `🛒 Order Confirmed!`,
+            body: `🎁 Your order (ID: ${orderId}) has been successfully placed. Thank you for shopping with us! 📦`,
+          },
+        };
 
-      const adminPromise = await admin;
-      adminPromise
-        .messaging()
-        .send(userPayload)
-        .then(async (response) => {
-          console.log("User notification sent successfully: ", response);
-        })
-        .catch((error) => {
-          console.log("Error sending user notification: ", error);
-        });
+        const adminPromise = await admin;
+        adminPromise
+          .messaging()
+          .send(userPayload)
+          .then(async (response) => {
+            console.log("User notification sent successfully: ", response);
+          })
+          .catch((error) => {
+            console.log("Error sending user notification: ", error);
+          });
+      } catch (fcmErr) {
+        console.log("Failed to process user notification: ", fcmErr);
+      }
     }
+
+    return res.status(200).json({
+      status: true,
+      message: "Orders created successfully.",
+      orders,
+    });
   } catch (error) {
-    console.error(error);
+    console.error("Error in createOrder: ", error);
     return res.status(500).json({ status: false, message: error.message || "Internal Server Error" });
   }
 };
@@ -1500,18 +1510,14 @@ exports.ordersOfUser = async (req, res) => {
 
     const userId = new mongoose.Types.ObjectId(req.query.userId);
 
-    const [user, order] = await Promise.all([User.findById(userId), Order.findOne({ userId: userId })]);
+    const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(200).json({ status: true, message: "User does not found!" });
+      return res.status(200).json({ status: false, message: "User not found!" });
     }
 
     if (user.isBlock) {
-      return res.status(200).json({ status: false, message: "you are blocked by the admin." });
-    }
-
-    if (!order) {
-      return res.status(200).json({ status: false, message: "This order does not belongs to your account!" });
+      return res.status(200).json({ status: false, message: "You are blocked by the admin." });
     }
 
     const start = req.query.start ? parseInt(req.query.start) : 1;
@@ -1722,7 +1728,7 @@ exports.getOrders = async (req, res) => {
     } else if (status === "Manual Auction Cancelled") {
       statusQuery = { "items.status": "Manual Auction Cancelled" };
     } else if (status === "Auction Cancelled") {
-      statusQuery = { "items.status": "Auction Cancelle" };
+      statusQuery = { "items.status": "Auction Cancelled" };
     } else if (status === "Auction Pending Payment") {
       statusQuery = { "items.status": "Auction Pending Payment" };
     } else if (status === "All") {
