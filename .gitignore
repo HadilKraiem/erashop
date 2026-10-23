@@ -1,0 +1,69 @@
+# Dependencies
+node_modules/
+**/node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+build/
+**/build/
+dist/
+**/dist/
+.dart_tool/
+**/.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# Android / iOS build artifacts & keys
+android/.gradle/
+**/android/.gradle/
+*.jks
+*.keystore
+android/key.properties
+**/android/key.properties
+*.apk
+*.aab
+
+# Environment & Secret configs
+.env
+.env.local
+.env.*.local
+admin/backend/config.js
+admin/backend/config.js.bak*
+admin/frontend/src/util/config.js
+admin/frontend/src/util/config.js.before*
+
+# Orphan Flutter folder
+Flutter/
+
+# Compiled frontend builds (copies of admin/frontend/build)
+admin/backend/public/
+/static/
+/index.html
+/asset-manifest.json
+/manifest.json
+/robots.txt
+/favicon.ico
+/logo192.png
+/logo512.png
+/dummy.png
+/Frame 162747.png
+/Frame 1627477.png
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE & OS
+.idea/
+**/.idea/
+.vscode/
+**/.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "737845450733",
+    "project_id": "live-shop-2053b",
+    "storage_bucket": "live-shop-2053b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:737845450733:android:4bd2d66ab716c949d979e4",
+        "android_client_info": {
+          "package_name": "com.incodes.erashop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "737845450733-8prk1jvedl24f4ou3tnqcto3q4hjp82t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.incodes.erashop",
+            "certificate_hash": "d2a6d1849a3f4b3d87a4d5483992f06e4a05f004"
+          }
+        },
+        {
+          "client_id": "737845450733-umarjr5v513cnao7sal9bk4bpic1f7pl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfVo65HtJ0Q-QLuZ7C6x8GAxBmhCBPAWE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "737845450733-umarjr5v513cnao7sal9bk4bpic1f7pl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "737845450733-td4074vh7rtta9kjoq926huijgiq387l.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.erashop.live"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
