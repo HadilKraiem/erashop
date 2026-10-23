@@ -5,6 +5,7 @@ import 'package:era_shop/utils/globle_veriables.dart';
 import 'package:era_shop/utils/show_toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'login_controller.dart';
@@ -58,8 +59,24 @@ class GoogleLoginController extends GetxController {
       } else {
         log("Google Login Current user is Null");
       }
-    } on FirebaseAuthException catch (e) {
-      log(e.code);
+    } on PlatformException catch (e, stackTrace) {
+      log("Google Sign-In PlatformException: code=${e.code}, message=${e.message}, details=${e.details}", error: e, stackTrace: stackTrace);
+      if (kDebugMode) {
+        print("Google Sign-In PlatformException: code=${e.code}, message=${e.message}, details=${e.details}");
+      }
+      displayToast(message: "Google Sign-In failed (${e.code}): ${e.message ?? 'Check configuration'}");
+    } on FirebaseAuthException catch (e, stackTrace) {
+      log("Google Sign-In FirebaseAuthException: code=${e.code}, message=${e.message}", error: e, stackTrace: stackTrace);
+      if (kDebugMode) {
+        print("Google Sign-In FirebaseAuthException: code=${e.code}, message=${e.message}");
+      }
+      displayToast(message: "Auth error: ${e.message ?? e.code}");
+    } catch (e, stackTrace) {
+      log("Google Sign-In unexpected error: $e", error: e, stackTrace: stackTrace);
+      if (kDebugMode) {
+        print("Google Sign-In unexpected error: $e");
+      }
+      displayToast(message: St.somethingWentWrong.tr);
     } finally {
       isLoading(false);
     }
