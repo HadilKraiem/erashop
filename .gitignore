@@ -67,3 +67,6 @@ yarn-error.log*
 *.swo
 .DS_Store
 Thumbs.db
+
+DB/settings.json
+admin/backend/setting.js
